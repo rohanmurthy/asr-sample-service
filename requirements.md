@@ -26,11 +26,10 @@
         - completed
       - the status of each audio chunk
       - completed time
-      - transcription (TODO: is this the final transcription or the transcription thus far in the job?)
+      - transcription
   - logic:
     - given the jobId, return the TranscriptResult of the job
     - get job data from jobs DB with jobId
-    - 
 - `/transcript/search`
   - input
     - jobStatus
@@ -39,7 +38,7 @@
     - transcript results
   - logic:
     - given a user and a jobStatus, find all the transcript results for that user that fits the specified jobStatus
-    - 
+    - fetch from the secondary index (user DB)
 
 ### Takeaways
 - store jobs in DB

@@ -37,14 +37,12 @@ async function transcribeAndStitch({ userId, jobId, audioChunkPaths}){
 
   const results = await Promise.all(promisesGetASROutputs)
     .then(asrOutputs => {
-      console.log(`asrOutputs: ${asrOutputs}`);
       const finalTranscription = asrOutputs.join(" ");
       updateTranscriptResult({ jobId, jobStatus: STATUS_DONE, transcriptText: finalTranscription, completedTime: new Date().toISOString() })
       updateUserDB({ userId, jobId, jobStatus: STATUS_DONE });
       return finalTranscription;
     })
     .catch(err => {
-      console.error("transcription failed: ", err);
       updateTranscriptResult({ jobId, jobStatus: STATUS_FAILED, completedTime: new Date().toISOString() })
       updateUserDB({ userId, jobId, jobStatus: STATUS_FAILED });
       throw err
@@ -53,9 +51,11 @@ async function transcribeAndStitch({ userId, jobId, audioChunkPaths}){
 }
 
 /**
- * NOTE?: the jobs could go in a queue?
+ * Starts a transcription job with the audio chunks for the provided user.
+ * 
  * @param {string[]} audioChunkPaths - The list of paths to the audio chunks.
  * @param {string} userId - The user's ID.
+ * @returns {string} - The job ID that was started.
  */
 export async function startTranscribeJob({ audioChunkPaths, userId }){
   // NOTE: in production we would use a legitimate UUID

@@ -25,9 +25,9 @@ curl -X POST http://localhost:3000/transcribe \
      -H "Content-Type: application/json" \
      -d '{"userId": "rohan", "audioChunkPaths": ["audio-file-7.wav", "audio-file-2.wav"]}'
 
-curl 'http://localhost:3000/transcript/1'  
+curl 'http://localhost:3000/transcript/1' | json_pp
 
-curl 'http://localhost:3000/transcript/search?jobStatus=done&userId=rohan'
+curl 'http://localhost:3000/transcript/search?jobStatus=done&userId=rohan' | json_pp
 ```
 
 ```sh

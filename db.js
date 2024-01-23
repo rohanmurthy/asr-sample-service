@@ -48,8 +48,6 @@ export function updateTranscriptResultChunkStatus({ jobId, audioChunkPath, chunk
  * @param {string} completedTime - The time the job was completed.
  */
 export function updateTranscriptResult({ jobId, jobStatus, transcriptText, completedTime }) {
-  console.log(`here2: ${jobId}`);
-
   if (!jobId) {
     return
   }
@@ -65,15 +63,6 @@ export function updateTranscriptResult({ jobId, jobStatus, transcriptText, compl
     transcriptResult.completedTime = completedTime;
   }
   jobsDB.set(jobId, transcriptResult);
-  // console.log(`here3: ${JSON.stringify(Array.from(jobsDB.entries()))}`);
-  console.log("updateTranscriptResult----------st");
-  console.log(`keys: ${[...jobsDB.keys()]}`);
-  jobsDB.forEach((value, key) => {
-      console.log(`${key} -> ${JSON.stringify(value)}`);
-  });
-  console.log("updateTranscriptResult----------end");
-
-  // console.log(`here4: ${JSON.stringify(transcriptResult)}`);
 }
 
 /**
@@ -85,15 +74,6 @@ export function updateTranscriptResult({ jobId, jobStatus, transcriptText, compl
  * @returns {TranscriptResult} - Object describing the transcribed text, statuses of the audio chunk transcriptions, job status, and completion time.
  */
 export function getDBTranscriptResult(jobId) {
-  // console.log(`here3: ${JSON.stringify(Array.from(jobsDB.entries()))}`);
-  // console.log(`here4: ${JSON.stringify(jobsDB.get(jobId))}`);
-  console.log("getDBTranscriptResult----------st");
-  console.log(`keys: ${[...jobsDB.keys()]}`);
-  jobsDB.forEach((value, key) => {
-    console.log(`${key} -> ${JSON.stringify(value)}`);
-  });
-  console.log(`jobId: ${jobId}`);
-  console.log("getDBTranscriptResult----------end");
   return jobsDB.get(jobId);
 }
 
@@ -108,10 +88,6 @@ export function getDBTranscriptResult(jobId) {
  */
 export function getUserJobIds({ userId, jobStatus }) {
   const key  = `${userId}:${jobStatus}`;
-  console.log(`getUserJobIds: ${key}`);
-  console.log(`getUserJobIds: ${userDB.get(key)}`);
-  console.log(`userDB: ${[...userDB.keys()]}`);
-  console.log(`getUserJobIds: ${JSON.stringify([...userDB.get(key)])}`);
   return userDB.get(key);
 }
 

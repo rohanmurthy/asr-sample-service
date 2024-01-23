@@ -81,7 +81,7 @@ fastify.get("/transcript/search", async function handler(request, reply) {
     return reply.code(400).send({ error: "Invalid query params" });
   }
 
-  const transcriptResults = getUserTranscriptResults({ jobStatus, userId }, fastify.userDB);
+  const transcriptResults = getUserTranscriptResults({ jobStatus, userId }, fastify.jobsDB, fastify.userDB);
   if (!transcriptResults) {
     return reply.code(404).send({ error: "transcriptResults for user ID and jobStatus do not exist" });
   }

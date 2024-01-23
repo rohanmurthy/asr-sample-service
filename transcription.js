@@ -86,7 +86,10 @@ export function getTranscriptResult(jobId, jobsDB) {
  * @param {string} userId - The user's ID.
  * @returns {TranscriptResult[]} - List of objects describing the transcribed text, statuses of the audio chunk transcriptions, job status, and completion time.
  */
-export function getUserTranscriptResults({ jobStatus, userId }, userDB) {
+export function getUserTranscriptResults({ jobStatus, userId }, jobsDB, userDB) {
   const jobIds = getUserJobIds({ userDB, userId, jobStatus });
-  return jobIds.map(jobId => getTranscriptResult(jobId));
+  if (!jobIds) {
+    return undefined
+  }
+  return [...jobIds].map(jobId => getTranscriptResult(jobId, jobsDB));
 }

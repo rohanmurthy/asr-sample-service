@@ -108,6 +108,10 @@ export function getDBTranscriptResult(jobId, jobsDB) {
  */
 export function getUserJobIds({ userDB, userId, jobStatus }) {
   const key  = `${userId}:${jobStatus}`;
+  console.log(`getUserJobIds: ${key}`);
+  console.log(`getUserJobIds: ${userDB.get(key)}`);
+  console.log(`userDB: ${[...userDB.keys()]}`);
+  console.log(`getUserJobIds: ${JSON.stringify([...userDB.get(key)])}`);
   return userDB.get(key);
 }
 

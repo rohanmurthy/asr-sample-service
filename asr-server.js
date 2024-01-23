@@ -1,5 +1,6 @@
 import Fastify from "fastify";
 import { TranscriptMocks } from "./mock-transcripts.js";
+import { startTranscribeJob, getTranscriptResult, getUserTranscriptResults } from "./transcription.js";
 
 const DELAY_MS = 5_000;
 const FAILURE_RATE = 1 / 10;
@@ -45,6 +46,40 @@ fastify.get("/get-asr-output", async function handler(request, reply) {
   }
 
   return { path, transcript: file.text };
+});
+
+fastify.post("/transcribe", async function handler(request, reply) {
+  if (!request.body) {
+    return reply.code(404).send({ error: "Invalid request body" });
+  }
+
+  const jobId = await startTranscribeJob(request.body);
+  return { jobId };
+});
+
+fastify.get("/transcript/:jobId", async function handler(request, reply) {
+  if (!request.params || !request.params.jobId) {
+    return reply.code(404).send({ error: "Invalid jobId" });
+  }
+
+  const transcriptResult = getTranscriptResult(request.params.jobId);
+  if (!transcriptResult) {
+    return reply.code(404).send({ error: "jobId does not exist" });
+  }
+  return { transcriptResult };
+});
+
+fastify.get("/transcript/search", async function handler(request, reply) {
+  const { jobStatus, userId } = request.query;
+  if (!jobStatus || !userId) {
+    return reply.code(404).send({ error: "Invalid query params" });
+  }
+
+  const transcriptResults = getUserTranscriptResults({ jobStatus, userId });
+  if (!transcriptResults) {
+    return reply.code(404).send({ error: "transcriptResults for user ID and jobStatus do not exist" });
+  }
+  return { transcriptResults };
 });
 
 try {

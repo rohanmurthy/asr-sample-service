@@ -45,16 +45,16 @@
   - NoSQL, like AWS DynamoDB
   - key: jobId
   - value: job data (userId, audioChunkPaths, jobStatus, completedTime)
-  - partition based on userId
+  - can partition based on userId
   - for implementation I will use memory but to productionize this we would need to persist this data to a legitimate NoSQL DB
     - in production we should cache results from this DB, using Redis or Memcached
 - store user-level data in DB
-  - key: userId
-  - value: jobIds and jobStatuses for those jobIds
-  - partition key: jobStatus
-
-
-**takeaway**: what we can do is immediately start transcribing audio files when they are uploaded, so by the time we invoke `transcribe`, we can simply fetch them from DB.
+  - NoSQL, like AWS DynamoDB
+  - key: userId:jobStatus
+  - value: jobIds for that user ID and job status combination
+  - for implementation I will use memory but to productionize this we would need to persist this data to a legitimate NoSQL DB
+    - in production we should cache results from this DB, using Redis or Memcached
+- What we can do is immediately start transcribing audio files when they are uploaded, so by the time we invoke `transcribe`, we can simply fetch them from DB.
 
 ## Non-functional
 - scalable to 1000 DAU

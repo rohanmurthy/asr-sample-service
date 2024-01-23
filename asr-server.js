@@ -15,8 +15,8 @@ const fastify = Fastify({
   logger: true,
 });
 
-fastify.decorate('jobsDB', new Map());
-fastify.decorate('userDB', new Map());
+// fastify.decorate('jobsDB', new Map());
+// fastify.decorate('userDB', new Map());
 
 let currentRequests = 0;
 
@@ -57,7 +57,7 @@ fastify.post("/transcribe", async function handler(request, reply) {
   }
   console.log(`here1: ${request.body}`);
 
-  const jobId = await startTranscribeJob(request.body, fastify.jobsDB, fastify.userDB);
+  const jobId = await startTranscribeJob(request.body);
   return { jobId };
 });
 
@@ -67,7 +67,7 @@ fastify.get("/transcript/:jobId", async function handler(request, reply) {
   }
   console.log(`here: ${request.params.jobId}`);
 
-  const transcriptResult = getTranscriptResult(request.params.jobId, fastify.jobsDB);
+  const transcriptResult = getTranscriptResult(request.params.jobId);
   console.log(`beforejobId does not exist -> ${JSON.stringify(transcriptResult)}`);
   if (!transcriptResult) {
     return reply.code(404).send({ error: "jobId does not exist" });
@@ -81,7 +81,7 @@ fastify.get("/transcript/search", async function handler(request, reply) {
     return reply.code(400).send({ error: "Invalid query params" });
   }
 
-  const transcriptResults = getUserTranscriptResults({ jobStatus, userId }, fastify.jobsDB, fastify.userDB);
+  const transcriptResults = getUserTranscriptResults({ jobStatus, userId });
   if (!transcriptResults) {
     return reply.code(404).send({ error: "transcriptResults for user ID and jobStatus do not exist" });
   }

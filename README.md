@@ -24,6 +24,10 @@ The primary dependency of this project is Fastify, a node.js webserver framework
 curl -X POST http://localhost:3000/transcribe \
      -H "Content-Type: application/json" \
      -d '{"userId": "rohan", "audioChunkPaths": ["audio-file-7.wav", "audio-file-2.wav"]}'
+
+curl 'http://localhost:3000/transcript/1'  
+
+curl 'http://localhost:3000/transcript/search?jobStatus=done&userId=rohan'
 ```
 
 ```sh

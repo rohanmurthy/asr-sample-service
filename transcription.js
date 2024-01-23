@@ -4,19 +4,19 @@ import { STATUS_DONE, STATUS_PENDING, STATUS_FAILED } from "./constants.js";
 
 let globalJobId = "1";
 
-function getASROutput(jobsDB, jobId, audioChunkPath, retries = 3, backoffDuration = 10) {
-  updateTranscriptResultChunkStatus({ jobsDB, jobId, audioChunkPath, chunkStatus: STATUS_PENDING });
+function getASROutput(jobId, audioChunkPath, retries = 3, backoffDuration = 10) {
+  updateTranscriptResultChunkStatus({ jobId, audioChunkPath, chunkStatus: STATUS_PENDING });
 
   return new Promise((resolve, reject) => {
     function invokeASR(n) {
       Axios.get(`http://localhost:3000/get-asr-output?path=${audioChunkPath}`)
         .then(resp => {
-          updateTranscriptResultChunkStatus({ jobsDB, jobId, audioChunkPath, chunkStatus: STATUS_DONE });
+          updateTranscriptResultChunkStatus({ jobId, audioChunkPath, chunkStatus: STATUS_DONE });
           resolve(resp.data.transcript);
         })
         .catch(err => {
           if (n === retries) {
-            updateTranscriptResultChunkStatus({ jobsDB, jobId, audioChunkPath, chunkStatus: STATUS_FAILED });
+            updateTranscriptResultChunkStatus({ jobId, audioChunkPath, chunkStatus: STATUS_FAILED });
             reject(err);
           } else {
             setTimeout(() => {
@@ -29,24 +29,24 @@ function getASROutput(jobsDB, jobId, audioChunkPath, retries = 3, backoffDuratio
   });
 }
 
-async function transcribeAndStitch({ jobsDB, userDB, userId, jobId, audioChunkPaths}){
-  updateTranscriptResult({ jobsDB, jobId, jobStatus: STATUS_PENDING })
-  updateUserDB({ userDB, userId, jobId, jobStatus: STATUS_PENDING });
+async function transcribeAndStitch({ userId, jobId, audioChunkPaths}){
+  updateTranscriptResult({ jobId, jobStatus: STATUS_PENDING })
+  updateUserDB({ userId, jobId, jobStatus: STATUS_PENDING });
 
-  const promisesGetASROutputs = audioChunkPaths.map(audioChunkPath => getASROutput(jobsDB, jobId, audioChunkPath));
+  const promisesGetASROutputs = audioChunkPaths.map(audioChunkPath => getASROutput(jobId, audioChunkPath));
 
   const results = await Promise.all(promisesGetASROutputs)
     .then(asrOutputs => {
       console.log(`asrOutputs: ${asrOutputs}`);
       const finalTranscription = asrOutputs.join(" ");
-      updateTranscriptResult({ jobsDB, jobId, jobStatus: STATUS_DONE, transcriptText: finalTranscription, completedTime: new Date().toISOString() })
-      updateUserDB({ userDB, userId, jobId, jobStatus: STATUS_DONE });
+      updateTranscriptResult({ jobId, jobStatus: STATUS_DONE, transcriptText: finalTranscription, completedTime: new Date().toISOString() })
+      updateUserDB({ userId, jobId, jobStatus: STATUS_DONE });
       return finalTranscription;
     })
     .catch(err => {
       console.error("transcription failed: ", err);
-      updateTranscriptResult({ jobsDB, jobId, jobStatus: STATUS_FAILED, completedTime: new Date().toISOString() })
-      updateUserDB({ userDB, userId, jobId, jobStatus: STATUS_FAILED });
+      updateTranscriptResult({ jobId, jobStatus: STATUS_FAILED, completedTime: new Date().toISOString() })
+      updateUserDB({ userId, jobId, jobStatus: STATUS_FAILED });
       throw err
     });
   return results;
@@ -57,13 +57,13 @@ async function transcribeAndStitch({ jobsDB, userDB, userId, jobId, audioChunkPa
  * @param {string[]} audioChunkPaths - The list of paths to the audio chunks.
  * @param {string} userId - The user's ID.
  */
-export async function startTranscribeJob({ audioChunkPaths, userId }, jobsDB, userDB){
+export async function startTranscribeJob({ audioChunkPaths, userId }){
   // NOTE: in production we would use a legitimate UUID
   const jobId = globalJobId;
   globalJobId = (Number(globalJobId) + 1).toString();
 
   // start job, in-parallel process all the audiochunks
-  transcribeAndStitch({ jobsDB, userDB, userId, jobId, audioChunkPaths });
+  transcribeAndStitch({ userId, jobId, audioChunkPaths });
 
   return jobId;
 }
@@ -75,8 +75,8 @@ export async function startTranscribeJob({ audioChunkPaths, userId }, jobsDB, us
  * @param {string} jobId - The job ID.
  * @returns {TranscriptResult} - Object describing the transcribed text, statuses of the audio chunk transcriptions, job status, and completion time.
  */
-export function getTranscriptResult(jobId, jobsDB) {
-  return getDBTranscriptResult(jobId, jobsDB);
+export function getTranscriptResult(jobId) {
+  return getDBTranscriptResult(jobId);
 }
 
 /**
@@ -86,10 +86,10 @@ export function getTranscriptResult(jobId, jobsDB) {
  * @param {string} userId - The user's ID.
  * @returns {TranscriptResult[]} - List of objects describing the transcribed text, statuses of the audio chunk transcriptions, job status, and completion time.
  */
-export function getUserTranscriptResults({ jobStatus, userId }, jobsDB, userDB) {
-  const jobIds = getUserJobIds({ userDB, userId, jobStatus });
+export function getUserTranscriptResults({ jobStatus, userId }) {
+  const jobIds = getUserJobIds({ userId, jobStatus });
   if (!jobIds) {
     return undefined
   }
-  return [...jobIds].map(jobId => getTranscriptResult(jobId, jobsDB));
+  return [...jobIds].map(jobId => getTranscriptResult(jobId));
 }

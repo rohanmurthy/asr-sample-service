@@ -4,7 +4,7 @@ import { STATUS_DONE, STATUS_PENDING, STATUS_FAILED } from "./constants.js";
  * key: jobId
  * value: TranscriptResult
 */
-// const jobsDB = new Map();
+const jobsDB = new Map();
 
 /**
  * key: userId:jobStatus
@@ -14,7 +14,7 @@ import { STATUS_DONE, STATUS_PENDING, STATUS_FAILED } from "./constants.js";
  * Primary index would be on jobId (like jobsDB). The secondary index would be on userId (like userDB).
  * AWS DynamoDB supports this.
 */
-// const userDB = new Map();
+const userDB = new Map();
 
 /**
  * Fetches the transcript result that's in jobsDB and updates its chunkStatuses based on the provided params.
@@ -25,7 +25,7 @@ import { STATUS_DONE, STATUS_PENDING, STATUS_FAILED } from "./constants.js";
  * @param {string} audioChunkPath - The path of the audio file.
  * @param {string} chunkStatus - The status of the audio chunk's processing.
  */
-export function updateTranscriptResultChunkStatus({ jobsDB, jobId, audioChunkPath, chunkStatus }) {
+export function updateTranscriptResultChunkStatus({ jobId, audioChunkPath, chunkStatus }) {
   if (!jobId || !audioChunkPath || !chunkStatus) {
     return
   }
@@ -47,7 +47,7 @@ export function updateTranscriptResultChunkStatus({ jobsDB, jobId, audioChunkPat
  * @param {string} transcriptText - The final transcription text.
  * @param {string} completedTime - The time the job was completed.
  */
-export function updateTranscriptResult({ jobsDB, jobId, jobStatus, transcriptText, completedTime }) {
+export function updateTranscriptResult({ jobId, jobStatus, transcriptText, completedTime }) {
   console.log(`here2: ${jobId}`);
 
   if (!jobId) {
@@ -84,7 +84,7 @@ export function updateTranscriptResult({ jobsDB, jobId, jobStatus, transcriptTex
  * @param {string} jobId - The job ID.
  * @returns {TranscriptResult} - Object describing the transcribed text, statuses of the audio chunk transcriptions, job status, and completion time.
  */
-export function getDBTranscriptResult(jobId, jobsDB) {
+export function getDBTranscriptResult(jobId) {
   // console.log(`here3: ${JSON.stringify(Array.from(jobsDB.entries()))}`);
   // console.log(`here4: ${JSON.stringify(jobsDB.get(jobId))}`);
   console.log("getDBTranscriptResult----------st");
@@ -106,7 +106,7 @@ export function getDBTranscriptResult(jobId, jobsDB) {
  * @param {string} jobStatus - The status of the job.
  * @returns {Set} - Set of jobIds.
  */
-export function getUserJobIds({ userDB, userId, jobStatus }) {
+export function getUserJobIds({ userId, jobStatus }) {
   const key  = `${userId}:${jobStatus}`;
   console.log(`getUserJobIds: ${key}`);
   console.log(`getUserJobIds: ${userDB.get(key)}`);
@@ -125,7 +125,7 @@ export function getUserJobIds({ userDB, userId, jobStatus }) {
  * @param {string} jobId - The job ID.
  * @param {string} jobStatus - The status of the job.
  */
-export function updateUserDB({ userDB, userId, jobId, jobStatus }){
+export function updateUserDB({ userId, jobId, jobStatus }){
   // add updated jobStatus
   const key  = `${userId}:${jobStatus}`;
   const currJobIds = userDB.get(key) || new Set();

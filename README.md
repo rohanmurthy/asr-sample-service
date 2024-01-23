@@ -21,5 +21,11 @@ The primary dependency of this project is Fastify, a node.js webserver framework
 ### Querying the server
 
 ```sh
+curl -X POST http://localhost:3000/transcribe \
+     -H "Content-Type: application/json" \
+     -d '{"userId": "rohan", "audioChunkPaths": ["audio-file-7.wav", "audio-file-2.wav"]}'
+```
+
+```sh
 curl 'http://localhost:3000/get-asr-output?path=audio-file-7.wav'
 ```

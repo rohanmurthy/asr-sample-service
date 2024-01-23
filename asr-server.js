@@ -15,6 +15,9 @@ const fastify = Fastify({
   logger: true,
 });
 
+fastify.decorate('jobsDB', new Map());
+fastify.decorate('userDB', new Map());
+
 let currentRequests = 0;
 
 fastify.addHook("onRequest", async (request, reply) => {
@@ -50,19 +53,22 @@ fastify.get("/get-asr-output", async function handler(request, reply) {
 
 fastify.post("/transcribe", async function handler(request, reply) {
   if (!request.body) {
-    return reply.code(404).send({ error: "Invalid request body" });
+    return reply.code(400).send({ error: "Invalid request body" });
   }
+  console.log(`here1: ${request.body}`);
 
-  const jobId = await startTranscribeJob(request.body);
+  const jobId = await startTranscribeJob(request.body, fastify.jobsDB, fastify.userDB);
   return { jobId };
 });
 
 fastify.get("/transcript/:jobId", async function handler(request, reply) {
   if (!request.params || !request.params.jobId) {
-    return reply.code(404).send({ error: "Invalid jobId" });
+    return reply.code(400).send({ error: "Invalid jobId" });
   }
+  console.log(`here: ${request.params.jobId}`);
 
-  const transcriptResult = getTranscriptResult(request.params.jobId);
+  const transcriptResult = getTranscriptResult(request.params.jobId, fastify.jobsDB);
+  console.log(`beforejobId does not exist -> ${JSON.stringify(transcriptResult)}`);
   if (!transcriptResult) {
     return reply.code(404).send({ error: "jobId does not exist" });
   }
@@ -72,10 +78,10 @@ fastify.get("/transcript/:jobId", async function handler(request, reply) {
 fastify.get("/transcript/search", async function handler(request, reply) {
   const { jobStatus, userId } = request.query;
   if (!jobStatus || !userId) {
-    return reply.code(404).send({ error: "Invalid query params" });
+    return reply.code(400).send({ error: "Invalid query params" });
   }
 
-  const transcriptResults = getUserTranscriptResults({ jobStatus, userId });
+  const transcriptResults = getUserTranscriptResults({ jobStatus, userId }, fastify.userDB);
   if (!transcriptResults) {
     return reply.code(404).send({ error: "transcriptResults for user ID and jobStatus do not exist" });
   }

@@ -67,7 +67,11 @@
   - **takeaway**: since some requests will always fail, do not infinitely retry. Have retries to ASR model: 3 should be sufficient. Exponential backoff should be implemented to ensure ASR model isn't impacted (we don't want to DoS ASR model).
 - return response to client within 15 seconds
   - **takeaway**: since calls to ASR model are 5-10s, this response should be cached so we don't need to constantly make calls to ASR on-the-fly
+- robust to restarts, resumes in-flight jobs which were killed
+  - **takeaway**: to satisfy persistence, we will have a processing Queue where jobs are sent, which are then picked up by a job processor/handler. Upon restart, the web server will send jobs to the queue that were pending.
 
 ## Non-requirements
 - implementing transcription method
 - implementing stitching method
+
+![Alt text](/diagram.png)

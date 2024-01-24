@@ -46,7 +46,6 @@ async function transcribeAndStitch({ userId, jobId, audioChunkPaths}){
     .catch(err => {
       updateTranscriptResult({ jobId, jobStatus: STATUS_FAILED, completedTime: new Date().toISOString() })
       updateUserDB({ userId, jobId, jobStatus: STATUS_FAILED });
-      throw err
     });
   return results;
 }

@@ -3,9 +3,13 @@
 This implements a mock ASR service for use as part of a takehome interview problem.
 
 `asr-server.js` : server and API defintion logic
+
 `transcription.js` : core logic for the audio transcription service
+
 `db.js` : logic for interacting with DB
+
 `constants.js` : constant definitions
+
 `requirements.md` : file going through thought process around function and non-functional requirements. Contains architectural diagram.
 
 I have many comments in the code that start with `NOTE:` (you can do a find for this in this repo) where I explain logic in more detail. For example, I use these comments to note points about what we would do to make some of these things production-ready.

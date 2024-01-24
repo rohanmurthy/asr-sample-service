@@ -37,6 +37,8 @@ curl 'http://localhost:3000/transcript/1' | json_pp
 
 curl 'http://localhost:3000/transcript/search?jobStatus=done&userId=rohan' | json_pp
 
+curl 'http://localhost:3000/transcript/search?jobStatus=pending&userId=rohan' | json_pp
+
 curl 'http://localhost:3000/transcript/search?jobStatus=failed&userId=rohan' | json_pp
 ```
 

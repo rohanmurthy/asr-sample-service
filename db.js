@@ -3,14 +3,16 @@ import { STATUS_DONE, STATUS_PENDING, STATUS_FAILED } from "./constants.js";
 /**
  * key: jobId
  * value: TranscriptResult
+ *
+ * NOTE: in production this would be a legitimate DB, not in-memory
 */
 const jobsDB = new Map();
 
 /**
  * key: userId:jobStatus
  * value: set(jobId)
- * 
- * NOTE: in production this would have a primary and secondary index. Secondary index would help with query optimization.
+ *
+ * NOTE: in production this would have a primary (jobs) and secondary (user) index. Secondary index would help with query optimization.
  * Primary index would be on jobId (like jobsDB). The secondary index would be on userId (like userDB).
  * AWS DynamoDB supports this.
 */

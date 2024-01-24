@@ -8,6 +8,7 @@ function getASROutput(jobId, audioChunkPath, retries = 3, backoffDuration = 10) 
   updateTranscriptResultChunkStatus({ jobId, audioChunkPath, chunkStatus: STATUS_PENDING });
 
   return new Promise((resolve, reject) => {
+    // NOTE: in production we should cache responses to the ASR model to optimize getting this data
     function invokeASR(n) {
       Axios.get(`http://localhost:3000/get-asr-output?path=${audioChunkPath}`)
         .then(resp => {
@@ -63,6 +64,8 @@ export async function startTranscribeJob({ audioChunkPaths, userId }){
   globalJobId = (Number(globalJobId) + 1).toString();
 
   // start job, in-parallel process all the audiochunks
+  // NOTE: I don't use await here to illustrate the idea that this API call is not blocked by the finishing of the job
+  // (the API call starts the job process)
   transcribeAndStitch({ userId, jobId, audioChunkPaths });
 
   return jobId;

@@ -10,7 +10,7 @@ This implements a mock ASR service for use as part of a takehome interview probl
 
 `constants.js` : constant definitions
 
-`requirements.md` : file going through thought process around function and non-functional requirements. Contains architectural diagram.
+`requirements.md` : file going through thought process around functional and non-functional requirements. Contains architectural diagram.
 
 I have many comments in the code that start with `NOTE:` (you can do a find for this in this repo) where I explain logic in more detail. For example, I use these comments to note points about what we would do to make some of these things production-ready.
 
